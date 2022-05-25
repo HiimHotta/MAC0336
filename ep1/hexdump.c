@@ -16,16 +16,61 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_FILE_NAME_SIZE 100
+#include "hexdump.h"
 
-typedef unsigned char byte_t;
+long get_file_size (char file_name[]) {
+    FILE *p_input_file;
 
-long get_file_size (char file_name[]);
+    long file_size;
 
-void read_file_to_array (char file_name[], byte_t file_bytes[], long file_size);
+    p_input_file = fopen (file_name, "r");
 
-void write_array_to_file (char file_name[], byte_t file_bytes[], long file_size);
+    if (p_input_file == NULL) {
+        printf ("Input file %s not found.nn", file_name);
+        exit (1);
+    }
 
+    fseek (p_input_file, 0, SEEK_END);
+
+    file_size = ftell (p_input_file);
+
+    fseek (p_input_file, 0, SEEK_SET);
+
+    fclose (p_input_file);
+
+    return file_size;
+}
+void read_file_to_array (char file_name[], byte_t file_bytes[], long file_size) {
+    FILE *p_input_file;
+
+    p_input_file = fopen (file_name, "rb");
+
+    if (p_input_file == NULL) {
+        printf ("Input file %s not found.nn", file_name);
+        exit (1);
+    }
+
+    fread (file_bytes, sizeof (*file_bytes), file_size, p_input_file);
+
+    fclose (p_input_file);
+}
+void write_array_to_file (char file_name[], byte_t file_bytes[], long file_size) {
+    FILE *p_output_file;
+
+    p_output_file = fopen (file_name, "wb");
+
+    if (p_output_file == NULL) {
+        printf ("Output file %s not found.nn", file_name);
+        exit (1);
+    }
+
+    fwrite (file_bytes, sizeof (*file_bytes), file_size, p_output_file);
+
+    fclose (p_output_file);
+}
+
+
+/*
 int main (int argc, char *argv[]) {
     long file_size;
 
@@ -75,54 +120,4 @@ int main (int argc, char *argv[]) {
 
     return 0;
 }
-
-long get_file_size (char file_name[]) {
-    FILE *p_input_file;
-
-    long file_size;
-
-    p_input_file = fopen (file_name, "rb");
-
-    if (p_input_file == NULL) {
-        printf ("Input file %s not found.nn", file_name);
-        exit (1);
-    }
-
-    fseek (p_input_file, 0, SEEK_END);
-
-    file_size = ftell (p_input_file);
-
-    fseek (p_input_file, 0, SEEK_SET);
-
-    fclose (p_input_file);
-
-    return file_size;
-}
-void read_file_to_array (char file_name[], byte_t file_bytes[], long file_size) {
-    FILE *p_input_file;
-
-    p_input_file = fopen (file_name, "rb");
-
-    if (p_input_file == NULL) {
-        printf ("Input file %s not found.nn", file_name);
-        exit (1);
-    }
-
-    fread (file_bytes, sizeof (*file_bytes), file_size, p_input_file);
-
-    fclose (p_input_file);
-}
-void write_array_to_file (char file_name[], byte_t file_bytes[], long file_size) {
-    FILE *p_output_file;
-
-    p_output_file = fopen (file_name, "wb");
-
-    if (p_output_file == NULL) {
-        printf ("Output file %s not found.nn", file_name);
-        exit (1);
-    }
-
-    fwrite (file_bytes, sizeof (*file_bytes), file_size, p_output_file);
-
-    fclose (p_output_file);
-}
+*/
